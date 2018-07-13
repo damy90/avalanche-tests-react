@@ -1,0 +1,11 @@
+entity AvalancheTest {
+	lon Double,
+    lat Double,
+    place String,
+    dangerLevel Integer,
+    content String,
+    user String required minlength(2),
+    dateCreated ZonedDateTime required
+}
+
+paginate AvalancheTest with infinite-scroll

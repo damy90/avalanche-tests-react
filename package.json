@@ -1,4 +1,3 @@
-
 {
   "name": "avalanche-tests",
   "version": "0.0.0",
@@ -9,12 +8,14 @@
     "node_modules"
   ],
   "dependencies": {
-    "@fortawesome/free-solid-svg-icons": "5.1.0",
     "@fortawesome/fontawesome-svg-core": "1.2.0",
+    "@fortawesome/free-solid-svg-icons": "5.1.0",
     "@fortawesome/react-fontawesome": "0.1.0",
     "availity-reactstrap-validation": "2.0.2",
     "axios": "0.18.0",
     "bootstrap": "4.1.1",
+    "jquery": "^3.3.1",
+    "leaflet": "1.3.1",
     "loaders.css": "0.1.2",
     "lodash": "4.17.10",
     "moment": "2.22.2",
@@ -24,6 +25,7 @@
     "react-dom": "16.4.1",
     "react-hot-loader": "3.1.1",
     "react-jhipster": "0.5.4",
+    "react-leaflet": "^2.0.0",
     "react-loadable": "5.4.0",
     "react-redux": "5.0.7",
     "react-redux-loading-bar": "4.0.5",
@@ -46,9 +48,9 @@
     "@types/node": "10.5.1",
     "@types/react": "16.4.6",
     "@types/react-dom": "16.0.6",
+    "@types/react-redux": "6.0.3",
     "@types/react-router-dom": "4.2.7",
     "@types/redux": "3.6.31",
-    "@types/react-redux": "6.0.3",
     "@types/webpack-env": "1.13.6",
     "browser-sync": "2.24.5",
     "browser-sync-webpack-plugin": "2.2.2",
@@ -65,8 +67,8 @@
     "generator-jhipster": "5.1.0",
     "html-webpack-plugin": "3.2.0",
     "http-proxy-middleware": "0.18.0",
-    "identity-obj-proxy": "3.0.0",
     "husky": "0.14.3",
+    "identity-obj-proxy": "3.0.0",
     "image-webpack-loader": "4.3.1",
     "jest": "23.2.0",
     "jest-junit": "5.1.0",
@@ -115,7 +117,10 @@
     "yarn": ">=1.3.2"
   },
   "lint-staged": {
-    "src/**/*.{ts,tsx,css,scss}": ["prettier --write", "git add"]
+    "src/**/*.{ts,tsx,css,scss}": [
+      "prettier --write",
+      "git add"
+    ]
   },
   "scripts": {
     "precommit": "lint-staged",

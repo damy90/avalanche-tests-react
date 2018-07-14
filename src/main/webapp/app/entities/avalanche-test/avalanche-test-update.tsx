@@ -24,6 +24,8 @@ export interface IAvalancheTestUpdateState {
 }
 
 export class AvalancheTestUpdate extends React.Component<IAvalancheTestUpdateProps, IAvalancheTestUpdateState> {
+  map: {};
+
   constructor(props) {
     super(props);
     this.state = {
@@ -37,7 +39,18 @@ export class AvalancheTestUpdate extends React.Component<IAvalancheTestUpdatePro
     if (this.state.isNew) {
       this.props.reset();
     } else {
-      this.props.getEntity(this.props.match.params.id);
+      const self = this;
+      this.props.getEntity(this.props.match.params.id).then(res => {
+        if (self.map) {
+          self.map.onData([this.props.avalancheTestEntity]);
+        }
+      });
+    }
+  }
+
+  onData(testsData) {
+    if (this.map) {
+      this.map.onData(testsData);
     }
   }
 
@@ -61,7 +74,7 @@ export class AvalancheTestUpdate extends React.Component<IAvalancheTestUpdatePro
   };
 
   handleClose = () => {
-    this.props.history.push('/entity/avalanche-test');
+    this.props.history.push('/');
   };
 
   handleUpdatePosition = (lat, lon) => {
@@ -162,7 +175,13 @@ export class AvalancheTestUpdate extends React.Component<IAvalancheTestUpdatePro
             )}
           </Col>
           <Col md="7">
-            <TestsMap handleUpdatePosition={this.handleUpdatePosition} />
+            <TestsMap
+              handleUpdatePosition={this.handleUpdatePosition}
+              showLocation={this.state.isNew}
+              ref={instance => {
+                this.map = instance;
+              }}
+            />
           </Col>
         </Row>
       </div>

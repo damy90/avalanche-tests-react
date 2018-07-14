@@ -50,6 +50,10 @@ export default class TestsMap extends React.Component {
   constructor(props) {
     super(props);
 
+    if (props.showLocation !== undefined) {
+      this.state.showLocation = props.showLocation;
+    }
+
     this.onData = this.onData.bind(this);
   }
 
@@ -79,7 +83,7 @@ export default class TestsMap extends React.Component {
 
     this.showLocation([e.latlng.lat, e.latlng.lng]);
     if (this.props.handleUpdatePosition) {
-      this.props.handleUpdatePosition(e.latlng.lat, e.latlng.lng);
+      this.props.handleUpdatePosition(e.latlng.lng, e.latlng.lat);
     }
   };
 
@@ -87,7 +91,7 @@ export default class TestsMap extends React.Component {
     const { lat, lng } = this.refmarker.current.leafletElement.getLatLng();
     this.setState({ lat, lng });
     if (this.props.handleUpdatePosition) {
-      this.props.handleUpdatePosition(lat, lng);
+      this.props.handleUpdatePosition(lng, lat);
     }
   };
 
@@ -141,7 +145,9 @@ export default class TestsMap extends React.Component {
     this.setState({ markers, lat: position[1], lng: position[0] });
   }
   componentDidMount() {
-    this.mapRef.current.leafletElement.locate();
+    if (this.state.showLocation) {
+      this.mapRef.current.leafletElement.locate();
+    }
   }
 
   render() {

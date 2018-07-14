@@ -1,7 +1,11 @@
 # avalancheTests
-This application was generated using JHipster 5.1.0, you can find documentation and help at [https://www.jhipster.tech/documentation-archive/v5.1.0](https://www.jhipster.tech/documentation-archive/v5.1.0).
+Author: Daniel Popov https://github.com/damy90/avalanche-tests-react
+
+Hopefully, this web page will one day be a crowd sorced avalanche buletin, where freeride skiers can share info instanteniously. I was "inspired" by the joke that is the official buletin where I live. 
 
 ## Development
+
+This application was generated using JHipster 5.1.0, you can find documentation and help at [https://www.jhipster.tech/documentation-archive/v5.1.0](https://www.jhipster.tech/documentation-archive/v5.1.0).
 
 Before you can build this project, you must install and configure the following dependencies on your machine:
 
@@ -9,6 +13,13 @@ Before you can build this project, you must install and configure the following 
    Depending on your system, you can install Node either from source or as a pre-packaged bundle.
 2. [Yarn][]: We use Yarn to manage Node dependencies.
    Depending on your system, you can install Yarn either from source or as a pre-packaged bundle.
+3. Install Java 8 from the Oracle website.
+4. Execute the wollowing commands from the project directory (only tested on windows)
+```bash
+set JAVA_HOME=C:\Program Files\Java\jdk1.7.0_04
+set PATH=%PATH%;%JAVA_HOME%\bin
+```
+5. Restart the terminal
 
 After installing Node, you should be able to run the following command to install development tools.
 You will only need to run this command when dependencies change in [package.json](package.json).

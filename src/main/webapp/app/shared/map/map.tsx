@@ -1,42 +1,7 @@
 import React from 'react';
-// import 'http://cdn.leafletjs.com/leaflet/v0.7.7/leaflet.css';
-// import 'http://cdn.leafletjs.com/leaflet/v0.7.7/leaflet.js';
-// import 'https://api.mapbox.com/mapbox.js/v2.2.3/mapbox.js';
-// import '../../../../../../scripts/leaflet-search';
-// import 'http://labs.easyblog.it/maps/leaflet-search/src/leaflet-search.css';
-// import 'https://maps.googleapis.com/maps/api/js?v=3&sensor=false';
-// import '../../../../../../scripts/leaflet-map';
 
 import { Map, TileLayer, Marker, Popup, Icon } from 'react-leaflet';
 import Leaflet from 'leaflet';
-//import Leaflet from 'leaflet';
-/*$(function () {
-    $("#organisations").multiselect();
-});*/
-import $ from 'jquery';
-import leafletMap from './../../../scripts/leaflet-map';
-import ReactDOM from 'react-dom';
-//import './../../../../../../target/www/content/images/'
-
-function ShowNearby(radius, e) {
-  $('#lat').val(e.latlng.lat);
-  $('#lon').val(e.latlng.lng);
-
-  let request = { lat: e.latlng.lat, lon: e.latlng.lng, radius: radius };
-  $.getJSON('/api/avalanche-tests', request, data => {
-    updateMap(data);
-  });
-}
-
-function updateMap(data) {
-  let position = {
-    Latitude: $('#lat').val(),
-    Longitude: $('#lon').val()
-  };
-
-  data.push(position);
-  leafletMap.onData(data);
-}
 
 const MyPopupMarker = ({ children, ...props }) => (
   <Marker {...props}>
@@ -64,43 +29,104 @@ export default class TestsMap extends React.Component {
   state = {
     lat: 0,
     lng: 0,
-    zoom: 13,
-    markers: []
+    zoom: 12,
+    markers: [],
+    bounds: null,
+    hasLocation: false,
+    showLocation: true
   };
+
+  mapRef = React.createRef();
+  lastMarkerId = 0;
 
   constructor(props) {
     super(props);
 
     this.onData = this.onData.bind(this);
   }
-  //map = null;
 
+  map = null;
+  refmarker = React.createRef();
+  markers = [];
+
+  handleLocationFound = e => {
+    if (this.state.bounds) {
+      this.state.bounds.extend(e.latlng);
+    }
+    this.setState({
+      hasLocation: true,
+      lat: e.latlng.lat,
+      lng: e.latlng.lng
+    });
+
+    this.showLocation([e.latlng.lat, e.latlng.lng]);
+  };
+
+  updatePosition = () => {
+    const { lat, lng } = this.refmarker.current.leafletElement.getLatLng();
+    this.setState({ lat, lng });
+  };
+
+  showLocation(position) {
+    this.markers.push({
+      key: this.lastMarkerId + 1,
+      position,
+      children: `lat: ${position[0]} lng: ${position[1]}`,
+      dragable: true,
+      onDragend: this.updatePosition
+      //ref: this.refmarker
+    });
+
+    this.setState({ markers: this.markers });
+  }
   onData(data) {
+    let bounds;
+    if (data.length > 0) {
+      let pos = [data[0].lon, data[0].lat];
+      bounds = Leaflet.latLngBounds(pos, pos);
+    }
+    let position;
+    if (this.state.hasLocation) {
+      position = [this.state.lng, this.state.lat];
+      bounds.extend(position);
+    }
+    let lastId = 0;
     const markers = data.map(marker => {
+      const position = [marker.lon, marker.lat];
+      if (bounds) {
+        bounds.extend(position);
+      }
+
+      lastId = marker.id;
       return {
         key: marker.id,
-        position: [marker.lon, marker.lat],
+        position,
         children: marker.content,
         icon: markerIcons[marker.dangerLevel - 1]
       };
+
+      this.setState({ bounds });
     });
 
+    this.markers = this.markers.concat(markers);
+    this.lastMarkerId = lastId;
+    if (this.state.showLocation && position) {
+      this.showLocation(position);
+    }
+
+    position = position || [data[0].lat, data[0].lon];
     // TODO: unswitch lat and lon
-    this.setState({ markers, lat: data[0].lon, lng: data[0].lat });
+    this.setState({ markers: this.markers, lat: position[1], lng: position[0] });
   }
   componentDidMount() {
-    $.getJSON('/api/avalanche-tests', null, this.onData);
+    this.mapRef.current.leafletElement.locate();
   }
-
-  // componentWillUnmount() {
-  //     this.map = null;
-  // }
 
   render() {
     const center = [this.state.lat, this.state.lng];
 
     return (
-      <Map center={center} zoom={this.state.zoom}>
+      <Map center={center} zoom={this.state.zoom} bounds={this.state.bounds} ref={this.mapRef} onLocationfound={this.handleLocationFound}>
         <TileLayer
           attribution="&amp;copy <a href=&quot;http://osm.org/copyright&quot;>OpenStreetMap</a> contributors"
           url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"

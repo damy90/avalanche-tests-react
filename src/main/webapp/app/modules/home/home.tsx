@@ -9,12 +9,31 @@ import { Row, Col, Alert } from 'reactstrap';
 import { IRootState } from 'app/shared/reducers';
 import { getSession } from 'app/shared/reducers/authentication';
 import TestsMap from './../../shared/map/map';
+import $ from 'jquery';
 
 export interface IHomeProp extends StateProps, DispatchProps {}
 
 export class Home extends React.Component<IHomeProp> {
+  map: {};
+
+  constructor(props) {
+    super(props);
+
+    this.state = {
+      testsData: []
+    };
+
+    this.onData = this.onData.bind(this);
+  }
   componentDidMount() {
     this.props.getSession();
+    $.getJSON('/api/avalanche-tests', null, this.onData);
+  }
+
+  onData(testsData) {
+    if (this.map) {
+      this.map.onData(testsData);
+    }
   }
 
   render() {
@@ -52,7 +71,11 @@ export class Home extends React.Component<IHomeProp> {
               </Alert>
             </div>
           )}
-          <TestsMap />
+          <TestsMap
+            ref={instance => {
+              this.map = instance;
+            }}
+          />
         </Col>
       </Row>
     );

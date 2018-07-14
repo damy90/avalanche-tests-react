@@ -9,6 +9,12 @@ const MyPopupMarker = ({ children, ...props }) => (
   </Marker>
 );
 
+// const MyLocation = ({marker, refmarker}) => (
+//     <Marker {...marker} ref={refmarker}>
+//       <Popup>{marker.children}</Popup>
+//     </Marker>
+//   );
+
 const MyMarkersList = ({ markers }) => {
   const items = markers.map(({ key, ...props }) => {
     return <MyPopupMarker key={key} {...props} />;
@@ -33,11 +39,13 @@ export default class TestsMap extends React.Component {
     markers: [],
     bounds: null,
     hasLocation: false,
-    showLocation: true
+    showLocation: true,
+    locationMarker: {}
   };
 
   mapRef = React.createRef();
   lastMarkerId = 0;
+  locationMarker = {};
 
   constructor(props) {
     super(props);
@@ -47,8 +55,18 @@ export default class TestsMap extends React.Component {
 
   map = null;
   refmarker = React.createRef();
-  markers = [];
 
+  MyLocation = ({ marker, refmarker, showLocation, hasLocation }) => {
+    if (showLocation && hasLocation && marker.position) {
+      return (
+        <Marker {...marker} ref={refmarker}>
+          <Popup>{marker.children}</Popup>
+        </Marker>
+      );
+    }
+
+    return null;
+  };
   handleLocationFound = e => {
     if (this.state.bounds) {
       this.state.bounds.extend(e.latlng);
@@ -60,24 +78,29 @@ export default class TestsMap extends React.Component {
     });
 
     this.showLocation([e.latlng.lat, e.latlng.lng]);
+    if (this.props.handleUpdatePosition) {
+      this.props.handleUpdatePosition(e.latlng.lat, e.latlng.lng);
+    }
   };
 
   updatePosition = () => {
     const { lat, lng } = this.refmarker.current.leafletElement.getLatLng();
     this.setState({ lat, lng });
+    if (this.props.handleUpdatePosition) {
+      this.props.handleUpdatePosition(lat, lng);
+    }
   };
 
   showLocation(position) {
-    this.markers.push({
+    this.locationMarker = {
       key: this.lastMarkerId + 1,
       position,
       children: `lat: ${position[0]} lng: ${position[1]}`,
-      dragable: true,
+      draggable: true,
       onDragend: this.updatePosition
       //ref: this.refmarker
-    });
-
-    this.setState({ markers: this.markers });
+    };
+    this.setState({ locationMarker: this.locationMarker });
   }
   onData(data) {
     let bounds;
@@ -87,7 +110,7 @@ export default class TestsMap extends React.Component {
     }
     let position;
     if (this.state.hasLocation) {
-      position = [this.state.lng, this.state.lat];
+      position = [this.state.lat, this.state.lng];
       bounds.extend(position);
     }
     let lastId = 0;
@@ -108,7 +131,6 @@ export default class TestsMap extends React.Component {
       this.setState({ bounds });
     });
 
-    this.markers = this.markers.concat(markers);
     this.lastMarkerId = lastId;
     if (this.state.showLocation && position) {
       this.showLocation(position);
@@ -116,7 +138,7 @@ export default class TestsMap extends React.Component {
 
     position = position || [data[0].lat, data[0].lon];
     // TODO: unswitch lat and lon
-    this.setState({ markers: this.markers, lat: position[1], lng: position[0] });
+    this.setState({ markers, lat: position[1], lng: position[0] });
   }
   componentDidMount() {
     this.mapRef.current.leafletElement.locate();
@@ -132,6 +154,13 @@ export default class TestsMap extends React.Component {
           url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
         />
         <MyMarkersList markers={this.state.markers} />
+
+        <this.MyLocation
+          marker={this.locationMarker}
+          refmarker={this.refmarker}
+          showLocation={this.state.showLocation}
+          hasLocation={this.state.hasLocation}
+        />
       </Map>
     );
   }

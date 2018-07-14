@@ -10,6 +10,7 @@ import { IRootState } from 'app/shared/reducers';
 import { getSession } from 'app/shared/reducers/authentication';
 import TestsMap from './../../shared/map/map';
 import $ from 'jquery';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
 export interface IHomeProp extends StateProps, DispatchProps {}
 
@@ -48,7 +49,12 @@ export class Home extends React.Component<IHomeProp> {
           </p>
           {account && account.login ? (
             <div>
-              <Alert color="success">You are logged in as user {account.login}.</Alert>
+              <Alert color="success">
+                You are logged in as user {account.login}.
+                <Link to={`/entity/avalanche-test/new`} className="btn btn-primary float-right jh-create-entity" id="jh-create-entity">
+                  <FontAwesomeIcon icon="plus" />&nbsp; Create new Avalanche Test
+                </Link>
+              </Alert>
             </div>
           ) : (
             <div>

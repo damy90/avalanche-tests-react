@@ -13,18 +13,23 @@ import { IAvalancheTest } from 'app/shared/model/avalanche-test.model';
 // tslint:disable-next-line:no-unused-variable
 import { convertDateTimeFromServer } from 'app/shared/util/date-utils';
 import { keysToValues } from 'app/shared/util/entity-utils';
+import TestsMap from './../../shared/map/map';
 
 export interface IAvalancheTestUpdateProps extends StateProps, DispatchProps, RouteComponentProps<{ id: number }> {}
 
 export interface IAvalancheTestUpdateState {
   isNew: boolean;
+  lat: number;
+  lon: number;
 }
 
 export class AvalancheTestUpdate extends React.Component<IAvalancheTestUpdateProps, IAvalancheTestUpdateState> {
   constructor(props) {
     super(props);
     this.state = {
-      isNew: !this.props.match.params || !this.props.match.params.id
+      isNew: !this.props.match.params || !this.props.match.params.id,
+      lat: 0,
+      lon: 0
     };
   }
 
@@ -59,6 +64,10 @@ export class AvalancheTestUpdate extends React.Component<IAvalancheTestUpdatePro
     this.props.history.push('/entity/avalanche-test');
   };
 
+  handleUpdatePosition = (lat, lon) => {
+    this.setState({ lat, lon });
+  };
+
   render() {
     const { avalancheTestEntity, loading, updating } = this.props;
     const { isNew } = this.state;
@@ -71,7 +80,7 @@ export class AvalancheTestUpdate extends React.Component<IAvalancheTestUpdatePro
           </Col>
         </Row>
         <Row className="justify-content-center">
-          <Col md="8">
+          <Col md="5">
             {loading ? (
               <p>Loading...</p>
             ) : (
@@ -86,13 +95,13 @@ export class AvalancheTestUpdate extends React.Component<IAvalancheTestUpdatePro
                   <Label id="lonLabel" for="lon">
                     Lon
                   </Label>
-                  <AvField id="avalanche-test-lon" type="number" className="form-control" name="lon" />
+                  <AvField id="avalanche-test-lon" type="number" className="form-control" name="lon" value={this.state.lon} />
                 </AvGroup>
                 <AvGroup>
                   <Label id="latLabel" for="lat">
                     Lat
                   </Label>
-                  <AvField id="avalanche-test-lat" type="number" className="form-control" name="lat" />
+                  <AvField id="avalanche-test-lat" type="number" className="form-control" name="lat" value={this.state.lat} />
                 </AvGroup>
                 <AvGroup>
                   <Label id="placeLabel" for="place">
@@ -151,6 +160,9 @@ export class AvalancheTestUpdate extends React.Component<IAvalancheTestUpdatePro
                 </Button>
               </AvForm>
             )}
+          </Col>
+          <Col md="7">
+            <TestsMap handleUpdatePosition={this.handleUpdatePosition} />
           </Col>
         </Row>
       </div>
